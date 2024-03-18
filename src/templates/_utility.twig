@@ -1,0 +1,114 @@
+{% import '_includes/forms.twig' as forms %}
+
+<h2>Invalidate AWS Cache</h2>
+<p>Invalidate everything, or uncheck to indicate a specific page.</p>
+
+<div>
+    {{ forms.lightswitchField({
+        label: "Invalidate Everything?"|t,
+        id: 'invalidateEverything',
+        name: 'invalidateEverything',
+        on: true,
+        instructions: '',
+    }) }}
+
+    <div id="specificPathContainer" style="display: none;">
+        {{ forms.autosuggestField({
+            label: "Specific Path"|t,
+            id: 'specificPath',
+            name: 'specificPath',
+            value: '',
+            instructions: 'Ex: /page/terms or /about'
+        }) }}
+    </div>
+
+    <br>
+    <button id="invalidate-cache-btn" class="btn" type="button">Invalidate AWS Cache</button>
+    <br>
+    <br>
+    <div id="results-aws"></div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function toggleSpecificPath(enable) {
+            var container = document.getElementById('specificPathContainer');
+
+
+            var input = document.getElementById('specificPath');
+            input.value = ''; // Clear the value
+            input.classList.remove('error');
+            if (enable) { // When lightswitch is off, enable becomes "false" as a string
+                container.style.display = 'none';
+            } else {
+                container.style.display = 'block';
+            }
+        }
+        var invalidateEverythingInput = document.querySelector('#invalidateEverything input[type="hidden"]');
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === "attributes" && mutation.attributeName === "value") {
+                    toggleSpecificPath(mutation.target.value);
+                }
+            });
+        });
+        observer.observe(invalidateEverythingInput, {
+            attributes: true
+        });
+
+
+        var btn = document.getElementById("invalidate-cache-btn")
+        btn.addEventListener("click", function() {
+            document.getElementById("results-aws").innerText = ''
+            var invalidateEverythingInput = document.querySelector('#invalidateEverything input[type="hidden"]');
+            var cont = true;
+            var path = ''
+            if (!invalidateEverythingInput.value) {
+                var input = document.getElementById('specificPath');
+                path = input.value
+                if (!path) {
+                    input.classList.add('error');
+                    document.getElementById("results-aws").innerText = 'Please choose a path'
+                    cont = false
+                } else {
+                    if (path && !path.startsWith('/')) {
+                        path = '/' + path;
+                        document.getElementById('specificPath').value = path; // Update the input with the corrected path
+                    }
+
+                    input.classList.remove('error');
+                }
+            }
+
+            if (cont) {
+                document.getElementById("results-aws").innerText = 'Sending Invalidation...'
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "{{ invalidateUrl }}", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.setRequestHeader("X-CSRF-Token", Craft.csrfTokenValue);
+                var requestBody = "path=" + encodeURIComponent(path);
+                xhr.onload = function() {
+                    btn.disabled = false; // Re-enable the button
+                    if (xhr.status >= 200 && xhr.status < 400) {
+                        var response = JSON.parse(xhr.responseText);
+                        document.getElementById("results-aws").innerText = response.message;
+                    } else {
+                        document.getElementById("results-aws").innerText = "Error invalidating cache.";
+                    }
+
+                    setTimeout(pingService, 4 * 1000)
+                };
+                xhr.send(requestBody);
+            }
+        });
+
+        // service is set to wait 10 seconds.  if no admin interaction occurs in 10 seconds, nothign will happen ont he page
+        function pingService() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{{ pingUrl }}", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.setRequestHeader("X-CSRF-Token", Craft.csrfTokenValue);
+            xhr.send();
+        }
+    });
+</script>

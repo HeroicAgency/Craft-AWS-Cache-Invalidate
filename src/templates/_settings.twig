@@ -1,0 +1,58 @@
+{# @var plugin \heroic\craftcacheinvalidator\CacheInvalidator #}
+{# @var settings \heroic\craftcacheinvalidator\models\Settings #}
+
+{% import '_includes/forms.twig' as forms %}
+
+<p>Here you can apply your AWS CloudFront settings.</p>
+
+
+{{ forms.lightswitchField({
+    label: "Enable Plugin?"|t,
+    id: 'enablePlugin',
+    name: 'enablePlugin',
+    instructions: 'It can be good to turn this off in local host or dev sites, but leave on in production.',
+    on: settings.enablePluginComplex ?? false,
+    tip: 'To set this in an environment variable, use AWS_CACHE_INVALIDATOR_ENABLE_PLUGIN=true (or false)'
+}) }}
+
+
+{{ forms.autosuggestField({
+    label: "Access Key ID"|t,
+    id: 'accessKeyId',
+    name: 'accessKeyId',
+    suggestEnvVars: true,
+    value: settings.accessKeyId,
+    instructions: 'You can leave this field empty if you are using an EC2 instance with an applicable IAM role assignment.'
+}) }}
+
+
+{{ forms.autosuggestField({
+    label: "Secret Access Key"|t,
+    id: 'secretAccessKey',
+    name: 'secretAccessKey',
+    suggestEnvVars: true,
+    value: settings.secretAccessKey,
+    instructions: 'You can leave this field empty if you are using an EC2 instance with an applicable IAM role assignment.'
+}) }}
+
+
+
+
+{{ forms.autosuggestField({
+    label: "Region"|t   ,
+    id: 'region',
+    name: 'region',
+    suggestEnvVars: true,
+    value: settings.region,
+    instructions: 'Ex: us-east-1.  Or leave blank because CloudFront does not require it in some cases'
+}) }}
+
+
+{{ forms.autosuggestField({
+    label: "Distribution ID"|t   ,
+    id: 'distributionId',
+    name: 'distributionId',
+    suggestEnvVars: true,
+    value: settings.region,
+    instructions: ''
+}) }}
