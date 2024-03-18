@@ -9,12 +9,14 @@ The ultimate Craft 4.3.5+ / 5+ plugin to invalidate the AWS CloudFront cache.
 * If you save a category or global, it will trigger a global invalidation.  This is because those elements can be used systemically.
 * You can disable the plugin in specified environments -- store AWS settings in config or .ENV files, not force you to provide a region, and a button in the control panel utilites to manually invalidate.
 * Add a new section in Utilities called "Invalidate AWS Cache".  Here you can manually trigger a global invalidation, or just a specific page.
+* You can also trigger a global invalidation by hitting this url: /cache-invalidator/invalidate
+  * ex: https://yoursite.com/cache-invalidator/invalidate
+  * Great for cron jobs
 * Through either the settings panel or your .ENV variables, you can specify:
   * Enable/Disable the plugin (great for disabling locally but leaving in production).
   * Access Key / Secret Acces key IDs (which you can also leave empty if you are using an EC2 instance with an applicable IAM role assignment)
   * Region (Or leave blank because CloudFront does not require it in some cases).
   * Distribution ID
-
 
 ## Requirements
 
