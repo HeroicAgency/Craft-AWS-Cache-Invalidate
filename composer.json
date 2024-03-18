@@ -3,6 +3,13 @@
     "description": "The ultimate Craft 4.3.5+ / 5+ plugin to invalidate the AWS CloudFront cache.  It works on entry or element save, as well as pinging a URL.  Includes special features to invalidate globally, disable the plugin in specified environments, store AWS settings in config or .ENV files, not force you to provide a region, and a button in the control panel utilites to manually invalidate.",
     "type": "craft-plugin",
     "license": "proprietary",
+    "keywords": [
+        "Amazon",
+        "CloudFront",
+        "Invalidate",
+        "Invalidaion",
+        "AWS"
+    ],
     "authors": [
         {
             "name": "Heroic",
